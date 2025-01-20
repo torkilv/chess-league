@@ -166,8 +166,10 @@ let processedEvenings = [];
 // Load results from files
 async function loadAllResults() {
     try {
-        // Use relative path from repository root
-        const response = await fetch('./results/index.json');
+        // Include repository name in path for GitHub Pages
+        const basePath = location.hostname === 'localhost' ? '.' : '/mdg-sjakk';
+        
+        const response = await fetch(`${basePath}/results/index.json`);
         const files = await response.json();
         console.log('Found files:', files);
         
@@ -175,8 +177,7 @@ async function loadAllResults() {
         
         for (const file of sortedFiles) {
             console.log('Processing file:', file);
-            // Use relative path from repository root
-            const response = await fetch(`./results/${file}`);
+            const response = await fetch(`${basePath}/results/${file}`);
             const text = await response.text();
             const date = file.replace('.txt', '');
             league.parseMatchResults(text, date);

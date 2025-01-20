@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MDG Sjakk - Parring</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <style>
+        :root {
+            --mdg-green: #5C9A42;
+            --mdg-dark-green: #1E5B28;
+            --mdg-light-green: #E4F0D8;
+            --mdg-text: #2D2D2D;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background: var(--mdg-light-green);
+            color: var(--mdg-text);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            margin: 0 0 10px 0;
+            color: var(--mdg-dark-green);
+            font-size: 1.2em;
+        }
+
+        button {
+            background: var(--mdg-green);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            background: #ccc;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            margin-right: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        .player-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .player-chip {
+            background: var(--mdg-light-green);
+            padding: 4px 12px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .player-chip button {
+            background: none;
+            color: var(--mdg-text);
+            padding: 0 4px;
+            font-size: 1.2em;
+        }
+
+        .match {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .result-buttons button {
+            padding: 4px 8px;
+            font-size: 0.9em;
+        }
+
+        #pairings {
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section">
+            <h2>Legg til spiller</h2>
+            <input type="text" id="playerName" placeholder="Navn">
+            <button onclick="addPlayer()">Legg til</button>
+        </div>
+
+        <div class="section">
+            <h2>Tilgjengelige spillere</h2>
+            <div id="availablePlayers" class="player-list"></div>
+        </div>
+
+        <div class="section">
+            <h2>Aktive partier</h2>
+            <div id="activeMatches"></div>
+            <div id="pairings">
+                <button onclick="generatePairings()">Lag nye parringer</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Kveldens resultater</h2>
+            <div id="results"></div>
+            <button onclick="downloadResults()">Last ned resultater</button>
+        </div>
+    </div>
+
+    <script>
+        let players = new Map(); // name -> {rating, wins}
+        let availablePlayers = new Set();
+        let activeMatches = [];
+        let results = [];
+
+        // Load existing ratings if available
+        async function loadRatings() {
+            try {
+                const response = await fetch('results/index.json');
+                const files = await response.json();
+                // Load most recent file to get current ratings
+                if (files.length > 0) {
+                    const latestFile = files[files.sort().pop()];
+                    // TODO: Load and parse ratings
+                }
+            } catch (error) {
+                console.error('Could not load ratings:', error);
+            }
+        }
+
+        function addPlayer() {
+            const input = document.getElementById('playerName');
+            const name = input.value.trim();
+            if (name) {
+                players.set(name, { rating: 1500, wins: 0 });
+                availablePlayers.add(name);
+                input.value = '';
+                updatePlayerList();
+            }
+        }
+
+        function removePlayer(name) {
+            availablePlayers.delete(name);
+            updatePlayerList();
+        }
+
+        function updatePlayerList() {
+            const container = document.getElementById('availablePlayers');
+            container.innerHTML = '';
+            
+            Array.from(availablePlayers).sort().forEach(name => {
+                const player = players.get(name);
+                const div = document.createElement('div');
+                div.className = 'player-chip';
+                div.innerHTML = `
+                    ${name} (${player.wins})
+                    <button onclick="removePlayer('${name}')">&times;</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function generatePairings() {
+            const available = Array.from(availablePlayers);
+            if (available.length < 2) return;
+
+            // Sort by wins, then rating
+            available.sort((a, b) => {
+                const winsA = players.get(a).wins;
+                const winsB = players.get(b).wins;
+                if (winsB !== winsA) return winsB - winsA;
+                return players.get(b).rating - players.get(a).rating;
+            });
+
+            // Create pairings
+            while (available.length >= 2) {
+                const white = available.shift();
+                const black = available.shift();
+                activeMatches.push({ white, black });
+            }
+
+            updateMatches();
+        }
+
+        function recordResult(matchIndex, result) {
+            const match = activeMatches[matchIndex];
+            results.push({
+                white: match.white,
+                black: match.black,
+                result: result
+            });
+
+            // Update wins
+            if (result === '1-0') {
+                players.get(match.white).wins++;
+            } else if (result === '0-1') {
+                players.get(match.black).wins++;
+            }
+
+            // Make players available again
+            availablePlayers.add(match.white);
+            availablePlayers.add(match.black);
+
+            // Remove match
+            activeMatches.splice(matchIndex, 1);
+
+            updatePlayerList();
+            updateMatches();
+        }
+
+        function updateMatches() {
+            const container = document.getElementById('activeMatches');
+            container.innerHTML = '';
+
+            activeMatches.forEach((match, index) => {
+                const div = document.createElement('div');
+                div.className = 'match';
+                div.innerHTML = `
+                    <span>${match.white} - ${match.black}</span>
+                    <div class="result-buttons">
+                        <button onclick="recordResult(${index}, '1-0')">1-0</button>
+                        <button onclick="recordResult(${index}, '0-1')">0-1</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function downloadResults() {
+            const text = results.map(r => 
+                `${r.white} - ${r.black} ${r.result}`
+            ).join('\n');
+
+            const date = new Date().toISOString().split('T')[0];
+            const blob = new Blob([text], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `${date}.txt`;
+            a.click();
+        }
+
+        // Initialize
+        loadRatings();
+    </script>
+</body>
+</html> 

@@ -1,9 +1,21 @@
+:root {
+    /* MDG Colors */
+    --mdg-green: #5C9A42;
+    --mdg-dark-green: #1E5B28;
+    --mdg-light-green: #E4F0D8;
+    --mdg-yellow: #F6D45C;
+    --mdg-orange: #E66C31;
+    --mdg-text: #2D2D2D;
+    --mdg-light-gray: #F5F5F5;
+}
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'GT Walsheim', 'Helvetica Neue', Arial, sans-serif;
     line-height: 1.6;
     margin: 0;
     padding: 20px;
-    background-color: #f4f4f4;
+    background-color: var(--mdg-light-gray);
+    color: var(--mdg-text);
 }
 
 .container {
@@ -11,8 +23,18 @@ body {
     margin: 0 auto;
     background-color: white;
     padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+h1, h2, h3 {
+    font-family: 'GT Walsheim', 'Helvetica Neue', Arial, sans-serif;
+    color: var(--mdg-dark-green);
+}
+
+h1 {
+    font-size: 2.5em;
+    margin-bottom: 1em;
 }
 
 table {
@@ -24,16 +46,17 @@ table {
 th, td {
     padding: 12px;
     text-align: left;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--mdg-light-green);
 }
 
 th {
-    background-color: #f8f8f8;
-    font-weight: bold;
+    background-color: var(--mdg-green);
+    color: white;
+    font-weight: 500;
 }
 
 tr:hover {
-    background-color: #f5f5f5;
+    background-color: var(--mdg-light-green);
 }
 
 .file-input-section {
@@ -57,12 +80,14 @@ input[type="file"] {
 .evenings-section {
     margin: 20px 0;
     padding: 15px;
-    background-color: #f8f8f8;
-    border-radius: 5px;
+    background-color: white;
+    border-radius: 8px;
+    border: 1px solid var(--mdg-light-green);
 }
 
 .evenings-section h2 {
     margin: 0 0 10px 0;
+    color: var(--mdg-dark-green);
 }
 
 .evenings-section ul {
@@ -73,13 +98,15 @@ input[type="file"] {
 
 .evenings-section li {
     padding: 3px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--mdg-light-green);
 }
 
 .next-event {
     margin: 0;
     padding: 3px 0;
-    border-bottom: 2px solid #eee;
+    border-bottom: 2px solid var(--mdg-green);
+    color: var(--mdg-dark-green);
+    font-weight: 500;
 }
 
 .evening-results {
@@ -100,10 +127,12 @@ input[type="file"] {
 }
 
 .evenings-section li span {
-    color: #2c5282;
+    color: var(--mdg-green);
+    cursor: pointer;
 }
 
 .evenings-section li span:hover {
+    color: var(--mdg-dark-green);
     text-decoration: underline;
 }
 
@@ -133,4 +162,18 @@ input[type="file"] {
 
 .evening-matches ul {
     margin: 5px 0;
+}
+
+@font-face {
+    font-family: 'GT Walsheim';
+    src: url('https://www.mdg.no/assets/fonts/GT-Walsheim-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'GT Walsheim';
+    src: url('https://www.mdg.no/assets/fonts/GT-Walsheim-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
 } 

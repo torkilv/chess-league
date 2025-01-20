@@ -166,7 +166,8 @@ let processedEvenings = [];
 // Load results from files
 async function loadAllResults() {
     try {
-        const response = await fetch('/results/index.json');
+        // Use relative path from repository root
+        const response = await fetch('./results/index.json');
         const files = await response.json();
         console.log('Found files:', files);
         
@@ -174,7 +175,8 @@ async function loadAllResults() {
         
         for (const file of sortedFiles) {
             console.log('Processing file:', file);
-            const response = await fetch(`/results/${file}`);
+            // Use relative path from repository root
+            const response = await fetch(`./results/${file}`);
             const text = await response.text();
             const date = file.replace('.txt', '');
             league.parseMatchResults(text, date);

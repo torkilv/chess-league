@@ -166,8 +166,8 @@ let processedEvenings = [];
 // Load results from files
 async function loadAllResults() {
     try {
-        // Include repository name in path for GitHub Pages
-        const basePath = location.hostname === 'localhost' ? '.' : '/mdg-sjakk';
+        // Get the base path from the current page URL
+        const basePath = location.pathname.split('/').slice(0, -1).join('/') || '.';
         
         const response = await fetch(`${basePath}/results/index.json`);
         const files = await response.json();

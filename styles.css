@@ -176,4 +176,19 @@ input[type="file"] {
     src: url('https://www.mdg.no/assets/fonts/GT-Walsheim-Medium.woff2') format('woff2');
     font-weight: 500;
     font-style: normal;
+}
+
+.info-section {
+    margin: 40px 0 20px 0;
+    padding: 20px;
+    background-color: var(--mdg-light-green);
+    border-radius: 8px;
+}
+
+.info-section h2 {
+    margin-top: 0;
+}
+
+.info-section p {
+    margin: 10px 0;
 } 

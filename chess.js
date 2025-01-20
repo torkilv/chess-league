@@ -166,8 +166,9 @@ let processedEvenings = [];
 // Load results from files
 async function loadAllResults() {
     try {
-        // Get the base path from the current page URL
-        const basePath = location.pathname.split('/').slice(0, -1).join('/') || '.';
+        // Check if we're on GitHub Pages
+        const isGitHubPages = location.hostname.includes('github.io');
+        const basePath = isGitHubPages ? '/chess-league' : '';
         
         const response = await fetch(`${basePath}/results/index.json`);
         const files = await response.json();

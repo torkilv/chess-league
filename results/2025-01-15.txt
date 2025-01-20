@@ -1,0 +1,11 @@
+torkil - torbjørn 1-0
+torbjørn -jonas 0 - 1
+axel - torkil 0 - 1
+jonas - torkil 1 - 0
+torbjørn - axel 1 - 0
+torkil - jonas 1 - 0
+harald - jonas 0 - 1
+torbjørn - harald 0 - 1
+torkil - axel 1 - 0
+harald - torkil 0 - 1
+axel - torbjørn 0 - 1 

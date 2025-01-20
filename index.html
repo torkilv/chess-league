@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MDGs Sjakkliga</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>MDGs Sjakkliga</h1>
+        
+        <div class="evenings-section">
+            <h2>Spillkvelder</h2>
+            <p class="next-event">Neste: <span id="next-event"></span> - The Good Knight (19-21)</p>
+            <ul id="evenings-list"></ul>
+        </div>
+        
+        <div class="standings-section">
+            <h2>Sammenlagt</h2>
+            <table id="standings-table">
+                <thead>
+                    <tr>
+                        <th>Plass</th>
+                        <th>Spiller</th>
+                        <th>Poeng</th>
+                        <th>Seire</th>
+                        <th>Tap</th>
+                        <th>MDG-rating</th>
+                    </tr>
+                </thead>
+                <tbody id="standings-body"></tbody>
+            </table>
+        </div>
+    </div>
+    <script src="chess.js"></script>
+</body>
+</html> 

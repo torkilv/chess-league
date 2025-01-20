@@ -1,0 +1,136 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f8f8f8;
+    font-weight: bold;
+}
+
+tr:hover {
+    background-color: #f5f5f5;
+}
+
+.file-input-section {
+    margin: 20px 0;
+    padding: 20px;
+    background-color: #f8f8f8;
+    border-radius: 5px;
+}
+
+.file-input-section h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+input[type="file"] {
+    display: block;
+    margin-top: 10px;
+}
+
+.evenings-section {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f8f8f8;
+    border-radius: 5px;
+}
+
+.evenings-section h2 {
+    margin: 0 0 10px 0;
+}
+
+.evenings-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0 0;
+}
+
+.evenings-section li {
+    padding: 3px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.next-event {
+    margin: 0;
+    padding: 3px 0;
+    border-bottom: 2px solid #eee;
+}
+
+.evening-results {
+    margin-left: 20px;
+    font-size: 0.9em;
+    padding: 5px 0;
+}
+
+.evening-results ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.evening-results li {
+    padding: 2px 0;
+    border-bottom: none;
+}
+
+.evenings-section li span {
+    color: #2c5282;
+}
+
+.evenings-section li span:hover {
+    text-decoration: underline;
+}
+
+.evening-rankings {
+    margin-bottom: 20px;
+}
+
+.evening-rankings h3, .evening-matches h3 {
+    margin: 10px 0 5px 0;
+    font-size: 1em;
+}
+
+.evening-rankings table {
+    width: 100%;
+    margin: 5px 0;
+    font-size: 0.9em;
+}
+
+.evening-rankings th {
+    text-align: left;
+    padding: 3px 10px 3px 0;
+}
+
+.evening-rankings td {
+    padding: 2px 10px 2px 0;
+}
+
+.evening-matches ul {
+    margin: 5px 0;
+} 

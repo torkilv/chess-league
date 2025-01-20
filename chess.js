@@ -97,9 +97,6 @@ class ChessLeague {
             // Skip empty lines
             if (!match.trim()) return;
 
-            // Log the match for debugging
-            console.log('Processing match:', match);
-
             // First split the line into players and score
             const [playersSection, scoreSection] = match.split(/(?<=\w)\s+(?=\d)/);
             if (!playersSection || !scoreSection) {
@@ -118,7 +115,6 @@ class ChessLeague {
                 return;
             }
 
-            console.log('Parsed:', { white, black, score1, score2 });
             
             // Store match with original player order (White-Black)
             eveningMatches.push({ 

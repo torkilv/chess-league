@@ -105,6 +105,12 @@
         #pairings {
             margin-top: 16px;
         }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
     </style>
 </head>
 <body>
@@ -131,7 +137,10 @@
         <div class="section">
             <h2>Kveldens resultater</h2>
             <div id="results"></div>
-            <button onclick="downloadResults()">Last ned resultater</button>
+            <div class="button-group">
+                <button onclick="downloadResults()">Last ned resultater</button>
+                <button onclick="clearState()" style="background: var(--mdg-orange)">Nullstill</button>
+            </div>
         </div>
     </div>
 
@@ -141,18 +150,83 @@
         let activeMatches = [];
         let results = [];
 
+        // Add these constants and ChessLeague class at the top of the script section
+        const INITIAL_ELO = 1500;
+        const K_FACTOR = 32;
+
+        class ChessLeague {
+            constructor() {
+                this.players = new Map();
+            }
+
+            calculateEloChange(winnerElo, loserElo) {
+                const expectedScore = 1 / (1 + Math.pow(10, (loserElo - winnerElo) / 400));
+                return Math.round(K_FACTOR * (1 - expectedScore));
+            }
+        }
+
+        // Create a league instance
+        const league = new ChessLeague();
+
         // Load existing ratings if available
         async function loadRatings() {
             try {
-                const response = await fetch('results/index.json');
-                const files = await response.json();
-                // Load most recent file to get current ratings
-                if (files.length > 0) {
-                    const latestFile = files[files.sort().pop()];
-                    // TODO: Load and parse ratings
+                const isGitHubPages = location.hostname.includes('github.io');
+                const basePath = isGitHubPages ? '/mdg-sjakk' : '';
+                
+                const response = await fetch(`${basePath}/results/ratings.json`);
+                if (response.ok) {
+                    const ratings = await response.json();
+                    Object.entries(ratings).forEach(([name, rating]) => {
+                        if (!players.has(name)) {
+                            players.set(name, {
+                                rating: rating,
+                                wins: 0,
+                                opponents: new Set(),
+                                whites: 0,
+                                blacks: 0
+                            });
+                        }
+                    });
                 }
             } catch (error) {
                 console.error('Could not load ratings:', error);
+            }
+        }
+
+        function saveState() {
+            const state = {
+                players: Array.from(players.entries()).map(([name, data]) => [
+                    name, 
+                    {
+                        ...data,
+                        opponents: Array.from(data.opponents)
+                    }
+                ]),
+                availablePlayers: Array.from(availablePlayers),
+                activeMatches,
+                results
+            };
+            localStorage.setItem('mdgChessState', JSON.stringify(state));
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem('mdgChessState');
+            if (saved) {
+                const state = JSON.parse(saved);
+                players = new Map(state.players.map(([name, data]) => [
+                    name,
+                    {
+                        ...data,
+                        opponents: new Set(data.opponents)
+                    }
+                ]));
+                availablePlayers = new Set(state.availablePlayers);
+                activeMatches = state.activeMatches;
+                results = state.results;
+                
+                updatePlayerList();
+                updateMatches();
             }
         }
 
@@ -160,16 +234,24 @@
             const input = document.getElementById('playerName');
             const name = input.value.trim();
             if (name) {
-                players.set(name, { rating: 1500, wins: 0 });
+                players.set(name, { 
+                    rating: 1500, 
+                    wins: 0,
+                    opponents: new Set(),
+                    whites: 0,  // Track number of games as white
+                    blacks: 0   // Track number of games as black
+                });
                 availablePlayers.add(name);
                 input.value = '';
                 updatePlayerList();
+                saveState();
             }
         }
 
         function removePlayer(name) {
             availablePlayers.delete(name);
             updatePlayerList();
+            saveState();
         }
 
         function updatePlayerList() {
@@ -181,7 +263,8 @@
                 const div = document.createElement('div');
                 div.className = 'player-chip';
                 div.innerHTML = `
-                    ${name} (${player.wins})
+                    ${name} (${player.wins}) ⚪${player.whites}⚫${player.blacks} 
+                    <span style="color: var(--mdg-dark-green)">${Math.round(player.rating)}</span>
                     <button onclick="removePlayer('${name}')">&times;</button>
                 `;
                 container.appendChild(div);
@@ -189,7 +272,10 @@
         }
 
         function generatePairings() {
-            const available = Array.from(availablePlayers);
+            const activePlayers = new Set(activeMatches.flatMap(m => [m.white, m.black]));
+            const available = Array.from(availablePlayers)
+                .filter(player => !activePlayers.has(player));
+
             if (available.length < 2) return;
 
             // Sort by wins, then rating
@@ -197,17 +283,65 @@
                 const winsA = players.get(a).wins;
                 const winsB = players.get(b).wins;
                 if (winsB !== winsA) return winsB - winsA;
-                return players.get(b).rating - players.get(a).rating;
+                return getPlayerRating(b) - getPlayerRating(a);
             });
 
-            // Create pairings
             while (available.length >= 2) {
-                const white = available.shift();
-                const black = available.shift();
-                activeMatches.push({ white, black });
+                const candidate = available.shift();
+                const candidatePlayer = players.get(candidate);
+                
+                // Determine preferred color for candidate
+                const preferWhite = candidatePlayer.whites < candidatePlayer.blacks;
+                
+                // Find the best opponent
+                let bestOpponentIndex = 0;
+                let bestScore = -Infinity;
+
+                const lookAhead = Math.min(4, available.length);
+                for (let i = 0; i < lookAhead; i++) {
+                    const possibleOpponent = available[i];
+                    const opponentPlayer = players.get(possibleOpponent);
+                    
+                    // Calculate a score for this pairing
+                    let score = 0;
+                    
+                    // Prefer players with fewer previous games against each other
+                    score -= candidatePlayer.opponents.has(possibleOpponent) ? 2 : 0;
+                    
+                    // Prefer color balance for both players
+                    const opponentPreferWhite = opponentPlayer.whites < opponentPlayer.blacks;
+                    if (preferWhite !== opponentPreferWhite) {
+                        score += 1; // Good: players prefer different colors
+                    }
+                    
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestOpponentIndex = i;
+                    }
+                }
+
+                // Get the best opponent and remove them from available
+                const opponent = available.splice(bestOpponentIndex, 1)[0];
+                const opponentPlayer = players.get(opponent);
+                
+                // Decide who gets white based on color balance
+                const opponentPreferWhite = opponentPlayer.whites < opponentPlayer.blacks;
+                
+                if (preferWhite === opponentPreferWhite) {
+                    // If both prefer the same color, give white to the one with fewer whites
+                    const white = candidatePlayer.whites <= opponentPlayer.whites ? candidate : opponent;
+                    const black = white === candidate ? opponent : candidate;
+                    activeMatches.push({ white, black });
+                } else {
+                    // If they prefer different colors, give them their preferred colors
+                    const white = preferWhite ? candidate : opponent;
+                    const black = preferWhite ? opponent : candidate;
+                    activeMatches.push({ white, black });
+                }
             }
 
             updateMatches();
+            saveState();
         }
 
         function recordResult(matchIndex, result) {
@@ -218,22 +352,43 @@
                 result: result
             });
 
-            // Update wins
+            // Update opponents and colors
+            players.get(match.white).opponents.add(match.black);
+            players.get(match.black).opponents.add(match.white);
+            players.get(match.white).whites++;
+            players.get(match.black).blacks++;
+
+            // Calculate rating changes
+            const whiteRating = players.get(match.white).rating;
+            const blackRating = players.get(match.black).rating;
+
             if (result === '1-0') {
+                const eloChange = league.calculateEloChange(whiteRating, blackRating);
+                players.get(match.white).rating += eloChange;
+                players.get(match.black).rating -= eloChange;
                 players.get(match.white).wins++;
             } else if (result === '0-1') {
+                const eloChange = league.calculateEloChange(blackRating, whiteRating);
+                players.get(match.white).rating -= eloChange;
+                players.get(match.black).rating += eloChange;
                 players.get(match.black).wins++;
+            } else if (result === '½-½') {
+                // For draws, use expected score to calculate small rating adjustments
+                const expectedWhite = 1 / (1 + Math.pow(10, (blackRating - whiteRating) / 400));
+                const eloChange = Math.round(K_FACTOR * (0.5 - expectedWhite));
+                players.get(match.white).rating += eloChange;
+                players.get(match.black).rating -= eloChange;
+                players.get(match.white).wins += 0.5;
+                players.get(match.black).wins += 0.5;
             }
 
-            // Make players available again
             availablePlayers.add(match.white);
             availablePlayers.add(match.black);
-
-            // Remove match
             activeMatches.splice(matchIndex, 1);
 
             updatePlayerList();
             updateMatches();
+            saveState();
         }
 
         function updateMatches() {
@@ -247,6 +402,7 @@
                     <span>${match.white} - ${match.black}</span>
                     <div class="result-buttons">
                         <button onclick="recordResult(${index}, '1-0')">1-0</button>
+                        <button onclick="recordResult(${index}, '½-½')">½-½</button>
                         <button onclick="recordResult(${index}, '0-1')">0-1</button>
                     </div>
                 `;
@@ -255,6 +411,7 @@
         }
 
         function downloadResults() {
+            // Save the evening's results
             const text = results.map(r => 
                 `${r.white} - ${r.black} ${r.result}`
             ).join('\n');
@@ -265,10 +422,42 @@
             a.href = URL.createObjectURL(blob);
             a.download = `${date}.txt`;
             a.click();
+
+            // Save the updated ratings
+            const ratings = {};
+            players.forEach((data, name) => {
+                ratings[name] = data.rating;
+            });
+            
+            const ratingsBlob = new Blob([JSON.stringify(ratings, null, 2)], { type: 'application/json' });
+            const ratingsLink = document.createElement('a');
+            ratingsLink.href = URL.createObjectURL(ratingsBlob);
+            ratingsLink.download = 'ratings.json';
+            ratingsLink.click();
+
+            if (confirm('Vil du nullstille for neste spillkveld?')) {
+                clearState();
+            }
+        }
+
+        function clearState() {
+            localStorage.removeItem('mdgChessState');
+            players = new Map();
+            availablePlayers = new Set();
+            activeMatches = [];
+            results = [];
+            updatePlayerList();
+            updateMatches();
+        }
+
+        // Add a helper function to get player rating for pairing
+        function getPlayerRating(name) {
+            return players.get(name)?.rating || 1500;
         }
 
         // Initialize
         loadRatings();
+        loadState();
     </script>
 </body>
 </html> 

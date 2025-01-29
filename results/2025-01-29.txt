@@ -11,7 +11,7 @@ Harald - Torkil 0 - 1
 Lage - Håkon 0 - 1
 Lage - Håkon 0 - 1
 Harald - Asbjørn  0 - 1
-Jonas - Håkon 0 - 1
+Jonas - Håkon 1 - 0
 Torkil - Lage 1 - 0
 Håkon - Harald 1/2 - 1/2
 Asbjørn - Torkil 1 - 0

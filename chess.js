@@ -268,7 +268,6 @@ function displayStandings() {
             <td>${player.name}</td>
             <td>${player.points}</td>
             <td>${player.wins}-${player.draws}-${player.losses}</td>
-            <td>${player.score}</td>
             <td>${Math.round(player.elo)}</td>
         `;
         tbody.appendChild(row);

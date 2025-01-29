@@ -22,7 +22,7 @@ class ChessLeague {
     }
 
     // Process a single match
-    processMatch(winner, loser) {
+    processMatch(winner, loser, score = 1) {
         winner = this.capitalizeName(winner);
         loser = this.capitalizeName(loser);
 
@@ -33,17 +33,15 @@ class ChessLeague {
             this.players.set(loser, { elo: INITIAL_ELO, points: 0, wins: 0, losses: 0 });
         }
 
-        const eloChange = this.calculateEloChange(
-            this.players.get(winner).elo,
-            this.players.get(loser).elo
-        );
+        const expectedScore = 1 / (1 + Math.pow(10, (this.players.get(loser).elo - this.players.get(winner).elo) / 400));
+        const eloChange = Math.round(K_FACTOR * (score - expectedScore));
 
         this.players.get(winner).elo += eloChange;
         this.players.get(loser).elo -= eloChange;
-        this.players.get(winner).wins += 1;
-        this.players.get(loser).losses += 1;
+        this.players.get(winner).wins += score;
+        this.players.get(loser).losses += score;
 
-        this.matches.push({ winner, loser });
+        this.matches.push({ winner, loser, score });
     }
 
     // Calculate evening results and assign Eurovision points
@@ -55,7 +53,7 @@ class ChessLeague {
         this.matches.forEach(match => {
             participants.add(match.winner);
             participants.add(match.loser);
-            wins.set(match.winner, (wins.get(match.winner) || 0) + 1);
+            wins.set(match.winner, (wins.get(match.winner) || 0) + match.score);
         });
 
         // Ensure all participants are in the wins map
@@ -123,11 +121,15 @@ class ChessLeague {
                 score: `${score1}-${score2}`
             });
 
-            // Process match for standings (winner/loser)
+            // Process match for standings (winner/loser/draw)
             if (score1 > score2) {
-                this.processMatch(white, black);
+                this.processMatch(white, black, 1);
+            } else if (score1 < score2) {
+                this.processMatch(black, white, 1);
             } else {
-                this.processMatch(black, white);
+                // Handle draw - both players get half a win
+                this.processMatch(white, black, 0.5);
+                this.processMatch(black, white, 0.5);
             }
         });
         

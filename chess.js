@@ -5,7 +5,7 @@ const EUROVISION_POINTS = [12, 10, 8, 7, 6, 5, 4, 3, 2, 1]; // Points for top 10
 
 class ChessLeague {
     constructor() {
-        this.players = new Map(); // Player name -> {elo, points, wins, losses}
+        this.players = new Map(); // Player name -> {elo, points, wins, draws, losses}
         this.matches = [];
         this.eveningResults = new Map(); // Store results by date
     }
@@ -27,10 +27,10 @@ class ChessLeague {
         loser = this.capitalizeName(loser);
 
         if (!this.players.has(winner)) {
-            this.players.set(winner, { elo: INITIAL_ELO, points: 0, wins: 0, losses: 0 });
+            this.players.set(winner, { elo: INITIAL_ELO, points: 0, wins: 0, draws: 0, losses: 0 });
         }
         if (!this.players.has(loser)) {
-            this.players.set(loser, { elo: INITIAL_ELO, points: 0, wins: 0, losses: 0 });
+            this.players.set(loser, { elo: INITIAL_ELO, points: 0, wins: 0, draws: 0, losses: 0 });
         }
 
         const expectedScore = 1 / (1 + Math.pow(10, (this.players.get(loser).elo - this.players.get(winner).elo) / 400));
@@ -38,8 +38,15 @@ class ChessLeague {
 
         this.players.get(winner).elo += eloChange;
         this.players.get(loser).elo -= eloChange;
-        this.players.get(winner).wins += score;
-        this.players.get(loser).losses += score;
+
+        // Update stats based on score
+        if (score === 1) {
+            this.players.get(winner).wins += 1;
+            this.players.get(loser).losses += 1;
+        } else if (score === 0.5) {
+            this.players.get(winner).draws += 1;
+            this.players.get(loser).draws += 1;
+        }
 
         this.matches.push({ winner, loser, score });
     }
@@ -148,7 +155,9 @@ class ChessLeague {
                 points: data.points,
                 elo: data.elo,
                 wins: data.wins,
-                losses: data.losses
+                draws: data.draws,
+                losses: data.losses,
+                score: data.wins + (data.draws * 0.5) // Total chess score
             }))
             .sort((a, b) => b.points - a.points);
     }
@@ -206,8 +215,8 @@ function displayStandings() {
             <td>${index + 1}</td>
             <td>${player.name}</td>
             <td>${player.points}</td>
-            <td>${player.wins}</td>
-            <td>${player.losses}</td>
+            <td>${player.wins}-${player.draws}-${player.losses}</td>
+            <td>${player.score}</td>
             <td>${Math.round(player.elo)}</td>
         `;
         tbody.appendChild(row);

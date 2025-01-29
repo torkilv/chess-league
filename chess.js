@@ -55,12 +55,43 @@ class ChessLeague {
     calculateEveningResults() {
         const wins = new Map();
         const participants = new Set();
+        const performances = new Map(); // Track rating performance
         
-        // Track all participants and count wins
+        // Initialize tracking
         this.matches.forEach(match => {
             participants.add(match.winner);
             participants.add(match.loser);
+            if (!performances.has(match.winner)) {
+                performances.set(match.winner, { 
+                    totalRating: 0, 
+                    games: 0,
+                    score: 0 
+                });
+            }
+            if (!performances.has(match.loser)) {
+                performances.set(match.loser, { 
+                    totalRating: 0, 
+                    games: 0,
+                    score: 0 
+                });
+            }
+        });
+
+        // Track wins and calculate performances
+        this.matches.forEach(match => {
             wins.set(match.winner, (wins.get(match.winner) || 0) + match.score);
+            
+            // Update performance data for winner
+            const winnerPerf = performances.get(match.winner);
+            winnerPerf.totalRating += this.players.get(match.loser).elo;
+            winnerPerf.games += 1;
+            winnerPerf.score += match.score;
+            
+            // Update performance data for loser
+            const loserPerf = performances.get(match.loser);
+            loserPerf.totalRating += this.players.get(match.winner).elo;
+            loserPerf.games += 1;
+            loserPerf.score += (1 - match.score);
         });
 
         // Ensure all participants are in the wins map
@@ -70,14 +101,35 @@ class ChessLeague {
             }
         });
 
-        // Sort players by wins
-        const sortedPlayers = Array.from(wins.entries())
-            .sort((a, b) => b[1] - a[1]);
+        // Calculate performance ratings
+        participants.forEach(player => {
+            const perf = performances.get(player);
+            if (perf.games > 0) {
+                const avgOpponentRating = perf.totalRating / perf.games;
+                const scorePercentage = perf.score / perf.games;
+                // Standard performance rating formula
+                perf.rating = avgOpponentRating + 400 * (2 * scorePercentage - 1);
+            } else {
+                perf.rating = this.players.get(player).elo;
+            }
+        });
 
-        // Store evening rankings with points
+        // Sort players by wins, then by performance rating
+        const sortedPlayers = Array.from(wins.entries())
+            .sort((a, b) => {
+                const winsA = a[1];
+                const winsB = b[1];
+                if (winsB !== winsA) return winsB - winsA;
+                
+                // Use performance rating as tiebreaker
+                return performances.get(b[0]).rating - performances.get(a[0]).rating;
+            });
+
+        // Store evening rankings with points and performance
         const eveningRankings = sortedPlayers.map((player, index) => ({
             name: player[0],
             wins: player[1],
+            performance: Math.round(performances.get(player[0]).rating),
             points: index < EUROVISION_POINTS.length ? EUROVISION_POINTS[index] : 0
         }));
 
@@ -263,7 +315,8 @@ function displayProcessedEvenings() {
                 <tr>
                     <th>Plass</th>
                     <th>Spiller</th>
-                    <th>Seire</th>
+                    <th>Score</th>
+                    <th>Performance</th>
                     <th>Poeng</th>
                 </tr>
             `;
@@ -274,6 +327,7 @@ function displayProcessedEvenings() {
                     <td>${index + 1}</td>
                     <td>${player.name}</td>
                     <td>${player.wins}</td>
+                    <td>${player.performance}</td>
                     <td>${player.points}</td>
                 `;
                 rankingsTable.appendChild(row);

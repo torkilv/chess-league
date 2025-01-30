@@ -393,6 +393,9 @@ function displayProcessedEvenings() {
                     score: m.score === 1 ? '1-0' : (m.score === 0.5 ? '½-½' : '0-1')
                 }));
 
+            matchesDiv.appendChild(matchesList);
+            resultsDiv.appendChild(matchesDiv);
+            
             if (friendlyMatches.length > 0) {
                 const friendlyDiv = document.createElement('div');
                 friendlyDiv.className = 'friendly-matches';
@@ -409,9 +412,6 @@ function displayProcessedEvenings() {
                 friendlyDiv.appendChild(friendlyList);
                 resultsDiv.appendChild(friendlyDiv);
             }
-
-            matchesDiv.appendChild(matchesList);
-            resultsDiv.appendChild(matchesDiv);
         }
         
         dateSpan.addEventListener('click', () => {

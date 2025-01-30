@@ -33,6 +33,7 @@ class ChessLeague {
             this.players.set(loser, { elo: INITIAL_ELO, points: 0, wins: 0, draws: 0, losses: 0 });
         }
 
+        // Calculate and update ELO ratings
         const expectedScore = 1 / (1 + Math.pow(10, (this.players.get(loser).elo - this.players.get(winner).elo) / 400));
         const eloChange = Math.round(K_FACTOR * (score - expectedScore));
 
@@ -64,6 +65,8 @@ class ChessLeague {
         tournamentMatches.forEach(match => {
             participants.add(match.winner);
             participants.add(match.loser);
+            if (!wins.has(match.winner)) wins.set(match.winner, 0);
+            if (!wins.has(match.loser)) wins.set(match.loser, 0);
             if (!performances.has(match.winner)) {
                 performances.set(match.winner, { 
                     totalRating: 0, 
@@ -82,15 +85,19 @@ class ChessLeague {
 
         // Track wins and calculate performances
         tournamentMatches.forEach(match => {
-            wins.set(match.winner, (wins.get(match.winner) || 0) + match.score);
+            // Add score to winner
+            wins.set(match.winner, wins.get(match.winner) + match.score);
+            // For draws, also add half point to loser
+            if (match.score === 0.5) {
+                wins.set(match.loser, wins.get(match.loser) + 0.5);
+            }
             
-            // Update performance data for winner
+            // Update performance data
             const winnerPerf = performances.get(match.winner);
             winnerPerf.totalRating += this.players.get(match.loser).elo;
             winnerPerf.games += 1;
             winnerPerf.score += match.score;
             
-            // Update performance data for loser
             const loserPerf = performances.get(match.loser);
             loserPerf.totalRating += this.players.get(match.winner).elo;
             loserPerf.games += 1;

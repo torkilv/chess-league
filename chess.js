@@ -380,10 +380,36 @@ function displayProcessedEvenings() {
             const matchesList = document.createElement('ul');
             results.matches.forEach(match => {
                 const matchLi = document.createElement('li');
-                matchLi.textContent = `${match.white} - ${match.black} ${match.score}`;
+                matchLi.innerHTML = `${match.white} - ${match.black} ${match.score}`;
                 matchesList.appendChild(matchLi);
             });
             
+            // Add friendly matches if any exist
+            const friendlyMatches = league.matches
+                .filter(m => m.friendly && m.date === evening)
+                .map(m => ({
+                    white: m.winner,
+                    black: m.loser,
+                    score: m.score === 1 ? '1-0' : (m.score === 0.5 ? '½-½' : '0-1')
+                }));
+
+            if (friendlyMatches.length > 0) {
+                const friendlyDiv = document.createElement('div');
+                friendlyDiv.className = 'friendly-matches';
+                friendlyDiv.innerHTML = '<h3>Partier som ikke telte for poeng grunnet parring</h3>';
+                
+                const friendlyList = document.createElement('ul');
+                friendlyMatches.forEach(match => {
+                    const matchLi = document.createElement('li');
+                    matchLi.innerHTML = `${match.white} - ${match.black} ${match.score}`;
+                    matchLi.className = 'friendly-match';
+                    friendlyList.appendChild(matchLi);
+                });
+                
+                friendlyDiv.appendChild(friendlyList);
+                resultsDiv.appendChild(friendlyDiv);
+            }
+
             matchesDiv.appendChild(matchesList);
             resultsDiv.appendChild(matchesDiv);
         }

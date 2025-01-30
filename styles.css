@@ -191,4 +191,20 @@ input[type="file"] {
 
 .info-section p {
     margin: 10px 0;
+}
+
+.friendly-matches {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed var(--mdg-light-green);
+}
+
+.friendly-matches h3 {
+    color: var(--mdg-green);
+    font-size: 0.9em;
+}
+
+.friendly-match {
+    color: var(--mdg-dark-green);
+    font-style: italic;
 } 

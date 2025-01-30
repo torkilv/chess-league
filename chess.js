@@ -386,7 +386,7 @@ function displayProcessedEvenings() {
             
             // Add friendly matches if any exist
             const friendlyMatches = league.matches
-                .filter(m => m.friendly && m.date === evening)
+                .filter(m => m.friendly)
                 .map(m => ({
                     white: m.winner,
                     black: m.loser,
@@ -396,7 +396,7 @@ function displayProcessedEvenings() {
             if (friendlyMatches.length > 0) {
                 const friendlyDiv = document.createElement('div');
                 friendlyDiv.className = 'friendly-matches';
-                friendlyDiv.innerHTML = '<h3>Partier som ikke telte for poeng grunnet parring</h3>';
+                friendlyDiv.innerHTML = '<h3>Ikke-tellende partier</h3>';
                 
                 const friendlyList = document.createElement('ul');
                 friendlyMatches.forEach(match => {

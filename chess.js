@@ -130,20 +130,52 @@ class ChessLeague {
                 return performances.get(b[0]).rating - performances.get(a[0]).rating;
             });
 
-        // Store evening rankings with points and performance
-        const eveningRankings = sortedPlayers.map((player, index) => ({
-            name: player[0],
-            wins: player[1],
-            performance: Math.round(performances.get(player[0]).rating),
-            points: index < EUROVISION_POINTS.length ? EUROVISION_POINTS[index] : 0
-        }));
+        // Group players by number of wins
+        const playerGroups = [];
+        let currentGroup = [sortedPlayers[0]];
 
-        // Assign points to players
-        sortedPlayers.forEach((player, index) => {
-            if (index < EUROVISION_POINTS.length) {
-                const currentPoints = this.players.get(player[0]).points || 0;
-                this.players.get(player[0]).points = currentPoints + EUROVISION_POINTS[index];
+        for (let i = 1; i < sortedPlayers.length; i++) {
+            if (sortedPlayers[i][1] === currentGroup[0][1]) {
+                currentGroup.push(sortedPlayers[i]);
+            } else {
+                playerGroups.push(currentGroup);
+                currentGroup = [sortedPlayers[i]];
             }
+        }
+        playerGroups.push(currentGroup);
+
+        // Assign points to groups
+        let currentPosition = 0;
+        const eveningRankings = [];
+
+        playerGroups.forEach(group => {
+            // Calculate points for this position group
+            let pointsSum = 0;
+            for (let i = 0; i < group.length; i++) {
+                const position = currentPosition + i;
+                if (position < EUROVISION_POINTS.length) {
+                    pointsSum += EUROVISION_POINTS[position];
+                }
+            }
+            
+            // Average points for the group
+            const pointsPerPlayer = group.length > 0 ? pointsSum / group.length : 0;
+
+            // Create rankings entries for each player in group
+            group.forEach(([name, wins]) => {
+                eveningRankings.push({
+                    name,
+                    wins,
+                    performance: Math.round(performances.get(name).rating),
+                    points: pointsPerPlayer
+                });
+
+                // Update total points for the player
+                const player = this.players.get(name);
+                player.points += pointsPerPlayer;
+            });
+
+            currentPosition += group.length;
         });
 
         return eveningRankings;

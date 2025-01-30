@@ -188,7 +188,6 @@ class ChessLeague {
         matches.forEach(match => {
             if (!match.trim()) return;
 
-            // Check if match is marked as friendly (prefixed with *)
             const friendly = match.startsWith('*');
             const matchText = friendly ? match.slice(1).trim() : match;
 
@@ -221,8 +220,8 @@ class ChessLeague {
             } else if (score1 < score2) {
                 this.processMatch(black, white, 1, friendly);
             } else {
+                // For draws, only process once with 0.5 points each
                 this.processMatch(white, black, 0.5, friendly);
-                this.processMatch(black, white, 0.5, friendly);
             }
         });
         

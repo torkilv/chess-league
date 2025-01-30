@@ -22,7 +22,7 @@ class ChessLeague {
     }
 
     // Process a single match
-    processMatch(winner, loser, score = 1) {
+    processMatch(winner, loser, score = 1, friendly = false) {
         winner = this.capitalizeName(winner);
         loser = this.capitalizeName(loser);
 
@@ -39,16 +39,18 @@ class ChessLeague {
         this.players.get(winner).elo += eloChange;
         this.players.get(loser).elo -= eloChange;
 
-        // Update stats based on score
-        if (score === 1) {
-            this.players.get(winner).wins += 1;
-            this.players.get(loser).losses += 1;
-        } else if (score === 0.5) {
-            this.players.get(winner).draws += 1;
-            this.players.get(loser).draws += 1;
+        // Only update stats if not a friendly game
+        if (!friendly) {
+            if (score === 1) {
+                this.players.get(winner).wins += 1;
+                this.players.get(loser).losses += 1;
+            } else if (score === 0.5) {
+                this.players.get(winner).draws += 1;
+                this.players.get(loser).draws += 1;
+            }
         }
 
-        this.matches.push({ winner, loser, score });
+        this.matches.push({ winner, loser, score, friendly });
     }
 
     // Calculate evening results and assign Eurovision points
@@ -57,8 +59,11 @@ class ChessLeague {
         const participants = new Set();
         const performances = new Map(); // Track rating performance
         
+        // Only process non-friendly matches
+        const tournamentMatches = this.matches.filter(m => !m.friendly);
+        
         // Initialize tracking
-        this.matches.forEach(match => {
+        tournamentMatches.forEach(match => {
             participants.add(match.winner);
             participants.add(match.loser);
             if (!performances.has(match.winner)) {
@@ -78,7 +83,7 @@ class ChessLeague {
         });
 
         // Track wins and calculate performances
-        this.matches.forEach(match => {
+        tournamentMatches.forEach(match => {
             wins.set(match.winner, (wins.get(match.winner) || 0) + match.score);
             
             // Update performance data for winner
@@ -151,20 +156,19 @@ class ChessLeague {
         this.matches = []; // Reset matches for this evening
         
         matches.forEach(match => {
-            // Skip empty lines
             if (!match.trim()) return;
 
-            // First split the line into players and score
-            const [playersSection, scoreSection] = match.split(/(?<=\w)\s+(?=\d)/);
+            // Check if match is marked as friendly (prefixed with *)
+            const friendly = match.startsWith('*');
+            const matchText = friendly ? match.slice(1).trim() : match;
+
+            const [playersSection, scoreSection] = matchText.split(/(?<=\w)\s+(?=\d)/);
             if (!playersSection || !scoreSection) {
                 console.error('Invalid match format:', match);
                 return;
             }
 
-            // Split players section - player1 is White, player2 is Black
             const [white, black] = playersSection.split('-').map(p => p.trim());
-            
-            // Parse score section
             const [score1, score2] = scoreSection.split('-').map(s => parseInt(s.trim()));
             
             if (isNaN(score1) || isNaN(score2)) {
@@ -172,26 +176,27 @@ class ChessLeague {
                 return;
             }
 
-            
-            // Store match with original player order (White-Black)
-            eveningMatches.push({ 
-                white: this.capitalizeName(white),
-                black: this.capitalizeName(black),
-                score: `${score1}-${score2}`
-            });
+            // Only add to evening matches if not friendly
+            if (!friendly) {
+                eveningMatches.push({ 
+                    white: this.capitalizeName(white),
+                    black: this.capitalizeName(black),
+                    score: `${score1}-${score2}`
+                });
+            }
 
-            // Process match for standings (winner/loser/draw)
+            // Process match with friendly flag
             if (score1 > score2) {
-                this.processMatch(white, black, 1);
+                this.processMatch(white, black, 1, friendly);
             } else if (score1 < score2) {
-                this.processMatch(black, white, 1);
+                this.processMatch(black, white, 1, friendly);
             } else {
-                // Handle draw - both players get half a win
-                this.processMatch(white, black, 0.5);
-                this.processMatch(black, white, 0.5);
+                this.processMatch(white, black, 0.5, friendly);
+                this.processMatch(black, white, 0.5, friendly);
             }
         });
         
+        // Calculate evening results only from non-friendly matches
         const rankings = this.calculateEveningResults();
         this.eveningResults.set(date, {
             matches: eveningMatches,

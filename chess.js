@@ -39,15 +39,13 @@ class ChessLeague {
         this.players.get(winner).elo += eloChange;
         this.players.get(loser).elo -= eloChange;
 
-        // Only update stats if not a friendly game
-        if (!friendly) {
-            if (score === 1) {
-                this.players.get(winner).wins += 1;
-                this.players.get(loser).losses += 1;
-            } else if (score === 0.5) {
-                this.players.get(winner).draws += 1;
-                this.players.get(loser).draws += 1;
-            }
+        // Update stats for all games, including friendly ones
+        if (score === 1) {
+            this.players.get(winner).wins += 1;
+            this.players.get(loser).losses += 1;
+        } else if (score === 0.5) {
+            this.players.get(winner).draws += 1;
+            this.players.get(loser).draws += 1;
         }
 
         this.matches.push({ winner, loser, score, friendly });
@@ -246,7 +244,7 @@ class ChessLeague {
                 wins: data.wins,
                 draws: data.draws,
                 losses: data.losses,
-                score: data.wins + (data.draws * 0.5) // Total chess score
+                score: data.wins + (data.draws * 0.5)
             }))
             .sort((a, b) => b.points - a.points);
     }

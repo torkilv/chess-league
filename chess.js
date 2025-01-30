@@ -192,16 +192,23 @@ class ChessLeague {
             const friendly = match.startsWith('*');
             const matchText = friendly ? match.slice(1).trim() : match;
 
-            const [playersSection, scoreSection] = matchText.split(/(?<=\w)\s+(?=\d)/);
+            const [playersSection, scoreSection] = matchText.split(/(?<=\w)\s+(?=\d|½)/);
             if (!playersSection || !scoreSection) {
                 console.error('Invalid match format:', match);
                 return;
             }
 
             const [white, black] = playersSection.split('-').map(p => p.trim());
-            const [score1, score2] = scoreSection.split('-').map(s => parseInt(s.trim()));
             
-            if (isNaN(score1) || isNaN(score2)) {
+            // Handle both numeric scores and ½-½ notation
+            let score1, score2;
+            if (scoreSection.includes('½')) {
+                score1 = score2 = 0.5;
+            } else {
+                [score1, score2] = scoreSection.split('-').map(s => parseInt(s.trim()));
+            }
+            
+            if ((isNaN(score1) || isNaN(score2)) && score1 !== 0.5) {
                 console.error('Invalid score format:', scoreSection);
                 return;
             }
@@ -210,7 +217,7 @@ class ChessLeague {
             const matchData = { 
                 white: this.capitalizeName(white),
                 black: this.capitalizeName(black),
-                score: `${score1}-${score2}`
+                score: score1 === 0.5 ? '½-½' : `${score1}-${score2}`
             };
 
             if (friendly) {
@@ -219,12 +226,11 @@ class ChessLeague {
                 eveningMatches.push(matchData);
             }
 
-            // Process match with friendly flag
-            if (score1 > score2) {
+            if (score1 === 1) {
                 this.processMatch(white, black, 1, friendly);
-            } else if (score1 < score2) {
+            } else if (score2 === 1) {
                 this.processMatch(black, white, 1, friendly);
-            } else {
+            } else if (score1 === 0.5) {
                 this.processMatch(white, black, 0.5, friendly);
             }
         });

@@ -183,6 +183,7 @@ class ChessLeague {
     parseMatchResults(text, date) {
         const matches = text.trim().split('\n');
         const eveningMatches = [];
+        const friendlyMatches = [];  
         this.matches = []; // Reset matches for this evening
         
         matches.forEach(match => {
@@ -205,13 +206,17 @@ class ChessLeague {
                 return;
             }
 
-            // Only add to evening matches if not friendly
-            if (!friendly) {
-                eveningMatches.push({ 
-                    white: this.capitalizeName(white),
-                    black: this.capitalizeName(black),
-                    score: `${score1}-${score2}`
-                });
+            // Store match in appropriate array
+            const matchData = { 
+                white: this.capitalizeName(white),
+                black: this.capitalizeName(black),
+                score: `${score1}-${score2}`
+            };
+
+            if (friendly) {
+                friendlyMatches.push(matchData);
+            } else {
+                eveningMatches.push(matchData);
             }
 
             // Process match with friendly flag
@@ -220,15 +225,14 @@ class ChessLeague {
             } else if (score1 < score2) {
                 this.processMatch(black, white, 1, friendly);
             } else {
-                // For draws, only process once with 0.5 points each
                 this.processMatch(white, black, 0.5, friendly);
             }
         });
         
-        // Calculate evening results only from non-friendly matches
         const rankings = this.calculateEveningResults();
         this.eveningResults.set(date, {
             matches: eveningMatches,
+            friendlyMatches: friendlyMatches,  // Store friendly matches with evening results
             rankings: rankings
         });
     }
@@ -381,25 +385,17 @@ function displayProcessedEvenings() {
                 matchesList.appendChild(matchLi);
             });
             
-            // Add friendly matches if any exist
-            const friendlyMatches = league.matches
-                .filter(m => m.friendly)
-                .map(m => ({
-                    white: m.winner,
-                    black: m.loser,
-                    score: m.score === 1 ? '1-0' : (m.score === 0.5 ? '½-½' : '0-1')
-                }));
-
             matchesDiv.appendChild(matchesList);
             resultsDiv.appendChild(matchesDiv);
             
-            if (friendlyMatches.length > 0) {
+            // Add friendly matches if any exist
+            if (results.friendlyMatches && results.friendlyMatches.length > 0) {
                 const friendlyDiv = document.createElement('div');
                 friendlyDiv.className = 'friendly-matches';
                 friendlyDiv.innerHTML = '<h3>Ikke-tellende partier</h3>';
                 
                 const friendlyList = document.createElement('ul');
-                friendlyMatches.forEach(match => {
+                results.friendlyMatches.forEach(match => {
                     const matchLi = document.createElement('li');
                     matchLi.innerHTML = `${match.white} - ${match.black} ${match.score}`;
                     matchLi.className = 'friendly-match';

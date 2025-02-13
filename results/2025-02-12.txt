@@ -1,0 +1,21 @@
+Håkon - Torbjørn 1 - 0
+Torkil - Asbjørn 1 - 0
+
+Håkon - Torkil 0 - 1
+Torbjørn - Asbjørn 1 - 0
+
+Torkil - Torbjørn 1 - 0
+Asbjørn - Håkon 1 - 0
+
+Asbjørn - Torkil 1 - 0
+Torbjørn - Håkon 0 - 1
+
+Torkil - Håkon 1 - 0
+Asbjørn - Torbjørn 1 - 0
+
+Håkon - Harald 1 - 0
+Torbjørn - Torkil 0 - 1
+Håkon - Asbjørn 1 - 0
+
+Harald - Torbjørn ½ - ½
+Asbjørn - Torkil 0 - 1

@@ -1,0 +1,13 @@
+torkil - torbjørn 1 - 0
+lars - torkil 0 - 1
+lars - torbjørn 0 - 1
+torbjørn - lars 0 - 1
+torkil - stian 1 - 0
+jonas - torkil 1 - 0
+stian - lars 0 - 1
+jonas - lars 1 - 0
+stian - torbjørn 1 - 0
+torbjørn - jonas 0 - 1
+lars - stian 1 - 0
+torkil - jonas 1 - 0
+torbjørn - stian 1 - 0

@@ -1,0 +1,30 @@
+Torbjørn - Asbjørn 0 - 1
+Torkil - Håkon 1 - 0
+
+Håkon - Harald 0 - 1
+Asbjørn - Torkil 0 - 1
+Jonas  - Torbjørn 1 - 0
+
+Julie - Håkon 0 - 1
+Harald - Asbjørn 0 - 1
+Torkil - Jonas 0 - 1
+
+Torbjørn - Julie 0 - 1
+Asbjørn- Jonas 0 - 1
+Harald- Torkil 0 - 1
+
+ Julie - Harald 0 - 1
+Torkil - Torbjørn 1 - 0
+Jonas - Håkon 1 - 0
+
+Asbjørn - Torbjørn 1 -0
+Julie - Anders 1 - 0
+Harald - Jonas 0 - 1
+Torkil - Håkon 0 -1
+
+
+Torbjørn - Anders 
+Harald - Julie 1 - 0
+Asbjørn - Torkil 1 - 0
+Harald - Julie 1 - 0
+Asbjørn - Torkil 1 - 0

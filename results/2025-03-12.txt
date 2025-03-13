@@ -23,7 +23,8 @@ Harald - Jonas 0 - 1
 Torkil - Håkon 0 -1
 
 
-Torbjørn - Anders 
+Torbjørn - Anders 1 - 0
+Torbjørn - Anders 1 - 0
 Harald - Julie 1 - 0
 Asbjørn - Torkil 1 - 0
 Harald - Julie 1 - 0

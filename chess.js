@@ -199,7 +199,7 @@ class ChessLeague {
             const friendly = match.startsWith('*');
             const matchText = friendly ? match.slice(1).trim() : match;
 
-            const [playersSection, scoreSection] = matchText.split(/(?<=\w)\s+(?=\d|½)/);
+            const [playersSection, scoreSection] = matchText.split(/(?<=(\w+\s)+)(?=\d|½)/);
             if (!playersSection || !scoreSection) {
                 console.error('Invalid match format:', match);
                 return;

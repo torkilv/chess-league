@@ -10,8 +10,6 @@ Jonas	1 - 0	Gavin Tanguay
 Harald	1 - 0	Fredrik Klæth Eriksen
 Joakim Kosmo	1 - 0	Hogne Neteland
 Sofie	0 - 1	Torkil
-		
-		
 Torkil	0 - 1	Lars
 Kjell Magne Fagerbakke	0 - 1	Svein Hammer
 Eirik Johannessen	0 - 1	Grunde Haraldsson Wesenberg
@@ -23,9 +21,7 @@ Christopher Hermansen	0 - 1	Frode Elias Lindal
 Jens Aldo Carrizo-Nilsen	0 - 1	Andreas Aukland
 Gavin Tanguay	1 - 0	Håkon
 Fredrik Klæth Eriksen	0 - 1	Hogne Neteland
-Ragnar Tonjer	1 - 0	Sofie
-		
-		
+Ragnar Tonjer	1 - 0	Sofie	
 Lars	0 - 1	Jonas
 Svein Hammer	1 - 0	Joakim Kosmo
 Grunde Haraldsson Wesenberg	0 - 1	Kimi Nie-Nilssen

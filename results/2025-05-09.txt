@@ -1,0 +1,54 @@
+Jakob Sande Haugset	1/2 - 1/2	Kimi Nie-Nilssen
+Kjell Magne Fagerbakke	1 - 0	Kristoffer Nieuwejaar
+Lars	1 - 0	Ragnar Tonjer
+Grunde Haraldsson Wesenberg	1 - 0	Christopher Hermansen
+Svein Hammer	1 - 0	Frode Elias Lindal
+Anette Eirik Flynn Opland	1 - 0	Jens Aldo Carrizo-Nilsen
+Håkon	0 - 1	Anders Marstrander
+Andreas Aukland	0 - 1	Eirik Johannessen
+Jonas	1 - 0	Gavin Tanguay
+Harald	1 - 0	Fredrik Klæth Eriksen
+Joakim Kosmo	1 - 0	Hogne Neteland
+Sofie	0 - 1	Torkil
+		
+		
+Torkil	0 - 1	Lars
+Kjell Magne Fagerbakke	0 - 1	Svein Hammer
+Eirik Johannessen	0 - 1	Grunde Haraldsson Wesenberg
+Anette Eirik Flynn Opland	0 - 1	Jonas
+Anders Marstrander	0 - 1	Joakim Kosmo
+Kimi Nie-Nilssen	1 - 0	Harald
+Kristoffer Nieuwejaar	1 - 0	Jakob Sande Haugset
+Christopher Hermansen	0 - 1	Frode Elias Lindal
+Jens Aldo Carrizo-Nilsen	0 - 1	Andreas Aukland
+Gavin Tanguay	1 - 0	Håkon
+Fredrik Klæth Eriksen	0 - 1	Hogne Neteland
+Ragnar Tonjer	1 - 0	Sofie
+		
+		
+Lars	0 - 1	Jonas
+Svein Hammer	1 - 0	Joakim Kosmo
+Grunde Haraldsson Wesenberg	0 - 1	Kimi Nie-Nilssen
+Kristoffer Nieuwejaar	0 - 1	Anette Eirik Flynn Opland
+Anders Marstrander	0 - 1	Eirik Johannessen
+Andreas Aukland	0 - 1	Torkil
+Harald	0 - 1	Kjell Magne Fagerbakke
+Hogne Neteland	0 - 1	Ragnar Tonjer
+Frode Elias Lindal	1 - 0	Gavin Tanguay
+Jakob Sande Haugset	1 - 0	Christopher Hermansen
+Sofie	1 - 0	Jens Aldo Carrizo-Nilsen
+Håkon	1 - 0	Fredrik Klæth Eriksen
+		
+		
+Jonas	0 - 1	Svein Hammer
+Kimi Nie-Nilssen	0 - 1	Lars
+Eirik Johannessen	0 - 1	Ragnar Tonjer
+Joakim Kosmo	0 - 1	Grunde Haraldsson Wesenberg
+Torkil	0 - 1	Anette Eirik Flynn Opland
+Frode Elias Lindal	0 - 1	Kjell Magne Fagerbakke
+Håkon	1 - 0	Jakob Sande Haugset
+Gavin Tanguay	0 - 1	Kristoffer Nieuwejaar
+Harald	1 - 0	Anders Marstrander
+Hogne Neteland	1 - 0	Andreas Aukland
+Fredrik Klæth Eriksen	1 - 0	Sofie
+Christopher Hermansen	1 - 0	Jens Aldo Carrizo-Nilsen

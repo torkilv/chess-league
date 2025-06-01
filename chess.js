@@ -12,7 +12,9 @@ class ChessLeague {
 
     // Helper to capitalize names
     capitalizeName(name) {
-        return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+        return name.split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(' ');
     }
 
     // Calculate ELO rating change
@@ -199,17 +201,21 @@ class ChessLeague {
             const friendly = match.startsWith('*');
             const matchText = friendly ? match.slice(1).trim() : match;
 
-            const [playersSection, scoreSection] = matchText.split(/(?<=(\w+\s)+)(?=\d|½)/);
-            if (!playersSection || !scoreSection) {
+            // Split on the last occurrence of a number, 1/2, or ½
+            const lastScoreIndex = matchText.search(/\d|1\/2|½/);
+            if (lastScoreIndex === -1) {
                 console.error('Invalid match format:', match);
                 return;
             }
 
+            const playersSection = matchText.slice(0, lastScoreIndex).trim();
+            const scoreSection = matchText.slice(lastScoreIndex).trim();
+
             const [white, black] = playersSection.split('-').map(p => p.trim());
             
-            // Handle both numeric scores and ½-½ notation
+            // Handle both numeric scores and draw notations
             let score1, score2;
-            if (scoreSection.includes('½')) {
+            if (scoreSection.includes('½') || scoreSection.includes('1/2')) {
                 score1 = score2 = 0.5;
             } else {
                 [score1, score2] = scoreSection.split('-').map(s => parseInt(s.trim()));
